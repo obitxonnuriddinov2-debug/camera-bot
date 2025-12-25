@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kamera Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { text-align: center; padding: 20px; font-family: sans-serif; }
+        video { width: 100%; max-width: 400px; border-radius: 10px; }
+        button { padding: 10px 20px; font-size: 18px; background: #248bca; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h3>Kameraga ruxsat bering</h3>
+    <video id="video" autoplay></video>
+    <br><br>
+    <button id="capture">Rasmga olish</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+
+        // Kamerani ishga tushirish
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { alert("Kameraga ruxsat berilmadi!"); });
+
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            // Rasmni Base64 formatiga o'tkazish
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Telegram botga ma'lumot yuborish
+            window.Telegram.WebApp.sendData(JSON.stringify({ image: imageData }));
+            window.Telegram.WebApp.close();
+        });
+    </script>
+</body>
+</html>
